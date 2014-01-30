@@ -47,7 +47,8 @@ namespace cwrap
         blue = 4,
         cyan = 5,
         magneta = 6,
-        white = 7
+        white = 7,
+        black = 8
     };
     
     /* Base for the wrapper: */
@@ -71,6 +72,7 @@ namespace cwrap
                 init_pair(5, COLOR_CYAN,    COLOR_BLACK);
                 init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
                 init_pair(7, COLOR_WHITE,   COLOR_BLACK);
+                init_pair(8, COLOR_BLACK, COLOR_WHITE);
             }
         }
         
@@ -91,20 +93,38 @@ namespace cwrap
         {
             std::stringstream *ss(new std::stringstream());
             (*ss)<< t;
-            std::string temps(ss->str());
-            delete ss;
+            char ch;
             
-            for(std::string::const_iterator it = temps.begin(); it != temps.end(); ++it)
+            while(ss->good())
             {
-                this->print_char(*it);
+                ss->get(ch);
+                if(!ss->fail())
+                {
+                    this->print_char(ch);
+                }
             }
-            temps.erase();
+            delete ss;
             return *this;
         }
         
         void set_color(const color_type& col) const
         {
+            short cx(stdscr->_curx), cy(stdscr->_cury);
             this->setcol(col);
+            
+            for(short x = stdscr->_begx; x <= COLS; x++)
+            {
+                for(short y = stdscr->_begy; y <= LINES; y++)
+                {
+                    mvaddch(y, x, inch());
+                }
+            }
+            move(cy, cx);
+        }
+        
+        short mid() const
+        {
+            return (COLS / 2);
         }
         
     private:
