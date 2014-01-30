@@ -1,0 +1,9 @@
+*.txt
+*.o
+*.a
+*.inc
+*dist
+*.exe
+*.sh
+*stat
+*nbproject
