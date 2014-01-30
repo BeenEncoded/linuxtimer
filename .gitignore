@@ -7,3 +7,4 @@
 *.sh
 *stat
 *nbproject
+/build/
