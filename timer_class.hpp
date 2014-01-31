@@ -110,6 +110,7 @@ namespace timerObj
         
         ~timer_class(){}
         
+        /* Starts the timer, by setting the beginning time. */
         void start()
         {
             timespec tempt;
@@ -117,16 +118,34 @@ namespace timerObj
             this->beg = clock_class((tempt.tv_nsec + (tempt.tv_sec * (unsigned long)1000000000)));
         }
         
+        /* Sets the timer, in seconds. */
         void set(const unsigned int& sec)
         {
             this->seconds_set = clock_class((sec * (unsigned long)1000000000));
         }
         
+        /* Returns the amount of time left on the clock.  If the end_time
+         has been passed, then it will start counting up.*/
         time_info_data time_left() const
         {
             timespec tempt;
             clock_gettime(CLOCK_REALTIME, &tempt);
-            return clock_class(this->end_time() - (tempt.tv_nsec + (tempt.tv_sec * (unsigned long)1000000000))).gtime();
+            unsigned long now((tempt.tv_nsec + (tempt.tv_sec * (unsigned long)1000000000))), end(this->end_time());
+            if(end < now)
+            {
+                std::swap(end, now);
+            }
+            return clock_class(end - now).gtime();
+        }
+        
+        /* Returns true if the timer has passed the end time.  This
+         allows it to count up from zero, once the end_time has been
+         reached, acting as an "overtime" clock.*/
+        bool finished() const
+        {
+            timespec tempt;
+            clock_gettime(CLOCK_REALTIME, &tempt);
+            return ((unsigned long)this->end_time() <= (tempt.tv_nsec + (tempt.tv_sec * (unsigned long)1000000000)));
         }
         
     private:

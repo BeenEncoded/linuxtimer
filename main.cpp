@@ -37,9 +37,11 @@ namespace
         return temps;
     }
     
-    inline void display_timer(const timerObj::time_info_data& timer)
+    inline void display_timer(const timerObj::time_info_data& timer, const bool& finished)
     {
-        common::center(std::string(formatted_number(timer.hours, 2) + " : " + 
+        common::center(std::string(
+                (finished ? "OVERTIME: " : std::string("")) + 
+                formatted_number(timer.hours, 2) + " : " + 
                 formatted_number(timer.minutes, 2) + " : " +
                 formatted_number(timer.seconds, 2) + " : " +
                 formatted_number(timer.miliseconds, 2)));
@@ -51,13 +53,13 @@ namespace
         using namespace common;
         
         timer_class timer;
-        timer.set(10 * 60);
+        timer.set(5);
         timer.start();
         while(!kbhit())
         {
             cls();
             for(short x = 0; x < 10; x++) cout<< endl;
-            display_timer(timer.time_left());
+            display_timer(timer.time_left(), timer.finished());
             usleep((1000000 / 30));
         }
     }
