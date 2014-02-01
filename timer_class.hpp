@@ -27,6 +27,12 @@ namespace timerObj
         friend std::ofstream& operator<<(std::ofstream&, clock_class&);
         
         explicit clock_class() : t(), delim(2) {}
+        explicit clock_class(const time_info_data& tid) : t(), delim(2)
+        {
+            t.tv_nsec = (((unsigned long)1000000000 / 100) * tid.miliseconds);
+            t.tv_sec = ((tid.hours * 60 * 60) + (tid.minutes * 60) + tid.seconds);
+        }
+        
         explicit clock_class(const long& ct) : t(), delim(2)
         {
             this->t.tv_nsec = ct;
@@ -122,6 +128,14 @@ namespace timerObj
         void set(const unsigned int& sec)
         {
             this->seconds_set = clock_class((sec * (unsigned long)1000000000));
+        }
+        
+        /* Allows the user to set the timer using clock_class, which
+         can be initialized with time_info_data to make it easy to
+         set the hours, minutes, and seconds the timer is to run.*/
+        void set(const clock_class& cc)
+        {
+            this->seconds_set = cc;
         }
         
         /* Returns the amount of time left on the clock.  If the end_time

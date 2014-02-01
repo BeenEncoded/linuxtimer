@@ -53,13 +53,17 @@ namespace
         using namespace common;
         
         timer_class timer;
-        timer.set(5);
+        timer.set(3);
         timer.start();
         while(!kbhit())
         {
             cls();
             for(short x = 0; x < 10; x++) cout<< endl;
             display_timer(timer.time_left(), timer.finished());
+            if(timer.finished())
+            {
+                system("beep -f 500 -d 500");
+            }
             usleep((1000000 / 30));
         }
     }
