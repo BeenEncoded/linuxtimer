@@ -6,32 +6,10 @@
 #include <sstream>
 #include "curses.h"
 
-namespace
-{
-    
-    inline bool kbhit()
-    {
-        nodelay(stdscr, TRUE);
-        noecho();
-        cbreak();
-        return (getch() != ERR);
-    }
-    
-    /* equivilant of getch() */
-    inline char gkey()
-    {
-        nodelay(stdscr, FALSE);
-        cbreak();
-        noecho();
-        char ch(getch());
-        return ch;
-    }
-    
-    inline void cls()
-    {
-        clear();
-    }
-}
+
+//defines
+#define endl '\n'
+
 
 namespace cwrap
 {
@@ -51,6 +29,23 @@ namespace cwrap
         black = 8
     };
     
+}
+
+
+namespace
+{
+    void getline(cwrap::curses_wrapper_input&, std::string&, const char&);
+    void getline(cwrap::curses_wrapper_input&, std::string&);
+    bool kbhit();
+    int gkey();
+    void cls();
+}
+
+
+/** Output and input objects: */
+namespace cwrap
+{
+    
     /* Base for the wrapper: */
     class curses_wrapper_class
     {
@@ -59,7 +54,7 @@ namespace cwrap
         {
             initscr();
             keypad(stdscr, TRUE);
-            nocbreak();
+            cbreak();
             echo();
             
             if (has_colors())
@@ -165,10 +160,12 @@ namespace cwrap
     
 }
 
+
+//in-file functions
 namespace
 {
-    cwrap::curses_wrapper_output cout;
     cwrap::curses_wrapper_input cin;
+    cwrap::curses_wrapper_output cout;
     
     /* Equivilant of the STL version. */
     inline void getline(cwrap::curses_wrapper_input& in, std::string& s, const char& delim)
@@ -176,7 +173,6 @@ namespace
         short x(stdscr->_curx), y(stdscr->_cury);
         bool backspace_hit(false);
         nodelay(stdscr, FALSE);
-        cbreak();
         noecho();
         s.erase();
         do
@@ -221,7 +217,25 @@ namespace
     }
     
     
-#define endl '\n'
+    inline bool kbhit()
+    {
+        nodelay(stdscr, TRUE);
+        noecho();
+        return (getch() != ERR);
+    }
+    
+    /* equivilant of getch() */
+    inline int gkey()
+    {
+        nodelay(stdscr, FALSE);
+        noecho();
+        return getch();
+    }
+    
+    inline void cls()
+    {
+        clear();
+    }
 }
 
 #endif

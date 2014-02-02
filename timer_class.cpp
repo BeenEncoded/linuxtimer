@@ -27,13 +27,13 @@ namespace
 /** File Stream Operators: */
 namespace timerObj
 {
-    ofstream& operator<<(ofstream& out, clock_class& c)
+    ostream& operator<<(ostream& out, clock_class& c)
     {
         out<< c.t.tv_sec<< c.delim;
         return out;
     }
     
-    ifstream& operator>>(ifstream& in, clock_class& c)
+    istream& operator>>(istream& in, clock_class& c)
     {
         c.t.tv_nsec = 0;
         if(!in.good())
@@ -48,6 +48,26 @@ namespace timerObj
         }
         temps->erase();
         delete temps;
+        return in;
+    }
+    
+    ostream& operator<<(ostream& out, timer_class& timer)
+    {
+        out<< timer.beg<< timer.seconds_set;
+        return out;
+    }
+    
+    istream& operator>>(istream& in, timer_class& timer)
+    {
+        timer = timer_class();
+        if(in.good())
+        {
+            in>> timer.beg;
+        }
+        if(in.good())
+        {
+            in>> timer.seconds_set;
+        }
         return in;
     }
     
