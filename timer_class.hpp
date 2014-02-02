@@ -17,14 +17,17 @@ namespace timerObj
         unsigned int hours, minutes, seconds, miliseconds;
     };
     
-    std::ifstream& operator>>(std::ifstream&, clock_class&);
-    std::ofstream& operator<<(std::ofstream&, clock_class&);
+    std::istream& operator>>(std::istream&, clock_class&);
+    std::ostream& operator<<(std::ostream&, clock_class&);
+    
+    std::ostream& operator<<(std::ostream&, timer_class&);
+    std::istream& operator>>(std::istream&, timer_class&);
     
     class clock_class
     {
     public:
-        friend std::ifstream& operator>>(std::ifstream&, clock_class&);
-        friend std::ofstream& operator<<(std::ofstream&, clock_class&);
+        friend std::istream& operator>>(std::istream&, clock_class&);
+        friend std::ostream& operator<<(std::ostream&, clock_class&);
         
         explicit clock_class() : t(), delim(2) {}
         explicit clock_class(const time_info_data& tid) : t(), delim(2)
@@ -45,7 +48,7 @@ namespace timerObj
             if(this != &cc)
             {
                 this->t.tv_nsec = cc.t.tv_nsec;
-                this->t.tv_sec = cc.t.tv_sec;
+                this->t.tv_nsec += (cc.t.tv_sec * (unsigned long)1000000000);
             }
             return *this;
         }
@@ -53,6 +56,11 @@ namespace timerObj
         bool operator==(const clock_class& cc) const
         {
             return ((this->t.tv_nsec == cc.t.tv_nsec) && (this->t.tv_sec == cc.t.tv_sec));
+        }
+        
+        bool operator!=(const clock_class& cc) const
+        {
+            return !(this->operator==(cc));
         }
         
         bool operator<(const clock_class& cc) const
@@ -111,10 +119,29 @@ namespace timerObj
     class timer_class
     {
     public:
+        friend std::ostream& operator<<(std::ostream&, timer_class&);
+        friend std::istream& operator>>(std::istream&, timer_class&);
+        
         explicit timer_class() : beg(0), 
                 seconds_set(0) {}
         
         ~timer_class(){}
+        
+        void operator=(const timer_class& tc)
+        {
+            this->beg = tc.beg;
+            this->seconds_set = tc.seconds_set;
+        }
+        
+        bool operator==(const timer_class& tc) const
+        {
+            return ((this->beg == tc.beg) && (this->seconds_set == tc.seconds_set));
+        }
+        
+        bool operator!=(const timer_class& tc) const
+        {
+            return !(this->operator==(tc));
+        }
         
         /* Starts the timer, by setting the beginning time. */
         void start()
@@ -162,6 +189,11 @@ namespace timerObj
             return ((unsigned long)this->end_time() <= (tempt.tv_nsec + (tempt.tv_sec * (unsigned long)1000000000)));
         }
         
+        time_info_data time_set() const
+        {
+            return this->seconds_set.gtime();
+        }
+        
     private:
         clock_class beg, seconds_set;
         
@@ -171,6 +203,9 @@ namespace timerObj
         }
         
     };
+    
+    
+    
 }
 
 #endif

@@ -38,6 +38,27 @@ namespace common
     bool is_special(const char&);
     bool is_char(const char&);
     
+    inline bool string_is_int(const std::string& s)
+    {
+        if(s.size() == 0)
+        {
+            return false;
+        }
+        for(std::string::const_iterator it = s.begin(); it != s.end(); ++it)
+        {
+            if(!is_number(*it))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    namespace input
+    {
+        std::string get_user_string(const std::string&);
+    }
+    
 }
 
 #endif
