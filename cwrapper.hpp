@@ -9,13 +9,15 @@
 
 //defines
 #define endl '\n'
-
+#define cout cwrap::curses_objects::stat_cout
+#define cin cwrap::curses_objects::stat_cin
 
 namespace cwrap
 {
     class curses_wrapper_class;
     class curses_wrapper_output;
     class curses_wrapper_input;
+    class curses_objects;
     
     //all the different colors:
     enum color_type{
@@ -52,36 +54,47 @@ namespace cwrap
     public:
         explicit curses_wrapper_class()
         {
-            initscr();
-            keypad(stdscr, TRUE);
-            cbreak();
-            echo();
-            
-            if (has_colors())
+            if(!this->initialized)
             {
-                start_color();
-                init_pair(1, COLOR_RED,     COLOR_BLACK);
-                init_pair(2, COLOR_GREEN,   COLOR_BLACK);
-                init_pair(3, COLOR_YELLOW,  COLOR_BLACK);
-                init_pair(4, COLOR_BLUE,    COLOR_BLACK);
-                init_pair(5, COLOR_CYAN,    COLOR_BLACK);
-                init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
-                init_pair(7, COLOR_WHITE,   COLOR_BLACK);
-                init_pair(8, COLOR_BLACK, COLOR_WHITE);
+                this->counter++;
+                initscr();
+                keypad(stdscr, TRUE);
+                cbreak();
+                echo();
+
+                if (has_colors())
+                {
+                    start_color();
+                    init_pair(1, COLOR_RED,     COLOR_BLACK);
+                    init_pair(2, COLOR_GREEN,   COLOR_BLACK);
+                    init_pair(3, COLOR_YELLOW,  COLOR_BLACK);
+                    init_pair(4, COLOR_BLUE,    COLOR_BLACK);
+                    init_pair(5, COLOR_CYAN,    COLOR_BLACK);
+                    init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
+                    init_pair(7, COLOR_WHITE,   COLOR_BLACK);
+                    init_pair(8, COLOR_BLACK, COLOR_WHITE);
+                }
+                this->initialized = true;
             }
         }
         
-        ~curses_wrapper_class()
+        virtual ~curses_wrapper_class()
         {
             endwin();
         }
-         
+        
+        static short counter;
+        
+    private:
+        static bool initialized;
     };
     
     /* output: */
     class curses_wrapper_output : public curses_wrapper_class
     {
     public:
+        explicit curses_wrapper_output(){}
+        ~curses_wrapper_output(){}
         
         template<class type>
         curses_wrapper_output& operator<<(const type& t)
@@ -141,6 +154,8 @@ namespace cwrap
     class curses_wrapper_input : public curses_wrapper_class
     {
     public:
+        explicit curses_wrapper_input(){}
+        ~curses_wrapper_input(){}
         
         template<class type>
         curses_wrapper_input& operator>>(const type& t)
@@ -158,15 +173,19 @@ namespace cwrap
         
     };
     
+    class curses_objects
+    {
+    public:
+        static curses_wrapper_class curses_base;
+        static curses_wrapper_output stat_cout;
+        static curses_wrapper_input stat_cin;
+    };
+    
 }
-
 
 //in-file functions
 namespace
 {
-    cwrap::curses_wrapper_input cin;
-    cwrap::curses_wrapper_output cout;
-    
     /* Equivilant of the STL version. */
     inline void getline(cwrap::curses_wrapper_input& in, std::string& s, const char& delim)
     {
@@ -215,7 +234,6 @@ namespace
     {
         getline(in, s, '\n');
     }
-    
     
     inline bool kbhit()
     {

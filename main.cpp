@@ -41,6 +41,7 @@ namespace
         while(true)
         {
             cls();
+            cout<< "Initialized: "<< cwrap::curses_wrapper_class::counter;
             cout<< endl;
             center("Timer");
             cout<< endl;

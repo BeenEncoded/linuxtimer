@@ -50,7 +50,7 @@ namespace common
         std::string get_user_string(const std::string& message)
         {
             std::string input;
-            char ch;
+            int ch;
             while(true)
             {
                 cls();
@@ -69,7 +69,7 @@ namespace common
                     {
                         switch(ch)
                         {
-                            case char(KEY_BACKSPACE):
+                            case KEY_BACKSPACE:
                             {
                                 if(input.size() > 0)
                                 {
@@ -78,14 +78,14 @@ namespace common
                             }
                             break;
 
-                            case char(ESCAPE_KEY):
+                            case KEY_CANCEL:
                             {
                                 input.erase();
                                 return GSTRING_CANCEL;
                             }
                             break;
                             
-                            case char(ENTER_KEY):
+                            case KEY_ENTER:
                             {
                                 return input;
                             }
